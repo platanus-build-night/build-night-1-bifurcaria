@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LoopIcon from "@mui/icons-material/Loop";
 import { Button } from "./ui/Button";
+import Image from "next/image";
 
 // Define a type for the API response
 interface ArtworkApiResponse {
@@ -150,7 +151,7 @@ export function Upload() {
       <div className="flex flex-col items-center justify-center gap-4">
         {preview ? (
           <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-lg border border-gray-200">
-            <img
+            <Image
               src={preview || "/placeholder.svg"}
               alt="Artwork preview"
               className="h-full w-full object-cover"
