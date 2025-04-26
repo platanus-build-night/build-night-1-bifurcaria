@@ -42,7 +42,7 @@ export default function FavouritesPage() {
         {favourites.length === 0 ? (
           <div className="flex min-h-[50vh] flex-col items-center justify-center space-y-4 rounded-lg border border-dashed p-8 text-center">
             <p className="text-lg text-gray-500">
-              You haven't saved any artworks yet.
+              You have not saved any artworks yet.
             </p>
             <Button asChild>
               <Link href="/">Discover Artworks</Link>
