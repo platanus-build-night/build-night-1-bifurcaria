@@ -6,40 +6,48 @@ import Image from "next/image";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Button } from "@/components/ui/Button";
-import { useFavourites } from "@/hooks/useFavourites";
-
-// Mock data for the artwork (in a real app, this would come from your n8n API)
-const mockArtwork = {
-  id: "123",
-  title: "Starry Night",
-  artist: "Vincent van Gogh",
-  year: "1889",
-  medium: "Oil on canvas",
-  dimensions: "73.7 cm × 92.1 cm",
-  location: "Museum of Modern Art, New York City",
-  description:
-    "The Starry Night is an oil on canvas painting by Dutch Post-Impressionist painter Vincent van Gogh. Painted in June 1889, it depicts the view from the east-facing window of his asylum room at Saint-Rémy-de-Provence, just before sunrise, with the addition of an imaginary village.",
-  imageUrl: "/placeholder.svg?height=800&width=600",
-};
+import { useFavourites, Artwork } from "@/hooks/useFavourites";
+import { ArtworkData } from "@/hooks/useArtworkIdentifier";
 
 export default function ArtworkPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
-  const [artwork, setArtwork] = useState<typeof mockArtwork | null>(null);
+  const [artwork, setArtwork] = useState<Artwork | null>(null);
   const { addFavorite, isFavorite } = useFavourites();
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    // In a real app, you would fetch the artwork data from your API
-    // For this MVP, we'll use the mock data
-    setArtwork(mockArtwork);
-
-    // Check if this artwork is already in favourites
+    // Try to retrieve artwork data from sessionStorage
     if (id) {
-      setSaved(isFavorite(id));
+      const storedArtwork = sessionStorage.getItem(`artwork-${id}`);
+
+      if (storedArtwork) {
+        try {
+          // Convert from API structure to UI structure
+          const apiData = JSON.parse(storedArtwork) as ArtworkData;
+
+          const uiData: Artwork = {
+            id: id,
+            title: apiData.title,
+            artist: apiData.author, // Map author to artist
+            year: apiData.year,
+            museum: apiData.museum, // Map museum to location
+            imageUrl: "/IMG_1123.png", // Placeholder for now
+          };
+
+          setArtwork(uiData);
+          setSaved(isFavorite(id));
+        } catch (error) {
+          console.error("Error parsing artwork data:", error);
+        }
+      } else {
+        // If no data in sessionStorage, redirect back to upload
+        console.error("No artwork data found for ID:", id);
+        router.push("/");
+      }
     }
-  }, [id, isFavorite]);
+  }, [id, isFavorite, router]);
 
   if (!artwork) {
     return (
@@ -50,8 +58,10 @@ export default function ArtworkPage() {
   }
 
   const handleSave = () => {
-    addFavorite(artwork);
-    setSaved(true);
+    if (artwork) {
+      addFavorite(artwork);
+      setSaved(true);
+    }
   };
 
   const handleBack = () => {
@@ -67,11 +77,12 @@ export default function ArtworkPage() {
         </Button>
 
         <div className="grid gap-8 md:grid-cols-2">
-          <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-100">
+          <div className="relative aspect-[3/2] w-full overflow-hidden rounded-lg bg-gray-100">
             <Image
               src={artwork.imageUrl || "/placeholder.svg"}
+              width={600}
+              height={400}
               alt={artwork.title}
-              fill
               className="object-cover"
               priority
             />
@@ -88,24 +99,11 @@ export default function ArtworkPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Medium</p>
-                  <p>{artwork.medium}</p>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="col-span-1">
+                  <p className="text-sm text-gray-500">Museum</p>
+                  <p>{artwork.museum}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Dimensions</p>
-                  <p>{artwork.dimensions}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-500">Location</p>
-                  <p>{artwork.location}</p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">Description</p>
-                <p className="mt-1">{artwork.description}</p>
               </div>
             </div>
 

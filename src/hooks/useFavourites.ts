@@ -2,17 +2,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-// Define the artwork type
-type Artwork = {
+// Define the artwork type to match the UI structure
+export type Artwork = {
   id: string;
   title: string;
   artist: string;
   year: string;
-  medium: string;
-  dimensions: string;
-  location: string;
-  description: string;
-  imageUrl: string;
+  museum: string;
+  imageUrl?: string;
+  // Keep optional fields for backward compatibility with any existing favorites
+  medium?: string;
+  dimensions?: string;
+  location?: string;
+  description?: string;
 };
 
 export function useFavourites() {
