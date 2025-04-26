@@ -95,10 +95,10 @@ export function Upload() {
           {loading ? (
             <>
               <LoopIcon className="mr-2 h-4 w-4 animate-spin" />
-              Recognizing artwork...
+              recognizing artwork...
             </>
           ) : (
-            "Recognize Artwork"
+            "recognize Artwork"
           )}
         </Button>
       </div>
