@@ -6,9 +6,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Artwork Recognition App",
+  title: "glimpse",
   description:
-    "Upload a photo of any artwork and instantly learn everything about it",
+    "upload a photo of any artwork and instantly learn everything about it",
 };
 
 export default function RootLayout({

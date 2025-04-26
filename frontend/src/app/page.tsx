@@ -7,19 +7,16 @@ export default function LandingPage() {
       <div className="w-full max-w-md space-y-8 text-center">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-            Discover Art
+            glimpse
           </h1>
-          <p className="text-gray-500 md:text-xl">
-            Upload a photo of any artwork and instantly learn everything about
-            it.
-          </p>
+          <p className="text-gray-500 md:text-xl">see art, learn everything</p>
         </div>
 
         <Upload />
 
         <div className="pt-4">
           <Button asChild variant="outline" className="w-full">
-            <a href="/favourites">View your saved artworks</a>
+            <a href="/favourites">browse your collection</a>
           </Button>
         </div>
       </div>

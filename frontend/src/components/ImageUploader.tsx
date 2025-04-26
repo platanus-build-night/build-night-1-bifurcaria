@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LoopIcon from "@mui/icons-material/Loop";
-import { Button } from "@/components/ui/Button";
+import { Button } from "./ui/Button";
 
 export function Upload() {
   const router = useRouter();
@@ -73,7 +73,7 @@ export function Upload() {
           <label className="flex aspect-square w-full max-w-xs cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 p-6 text-center hover:bg-gray-50">
             <CloudUploadIcon className="h-10 w-10 text-gray-400" />
             <div className="space-y-1">
-              <p className="text-sm font-medium">Upload artwork photo</p>
+              <p className="text-sm font-medium">upload artwork photo</p>
               <p className="text-xs text-gray-500">
                 JPG, PNG or WEBP (max. 10MB)
               </p>
