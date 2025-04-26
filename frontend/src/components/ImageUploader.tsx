@@ -1,94 +1,107 @@
-// frontend/src/components/ImageUploader.tsx
-"use client"; // Required for components with event listeners/state in Next.js App Router
+"use client";
 
-import React, { useState, useCallback } from "react";
+import type React from "react";
 
-interface ImageUploaderProps {
-  // Callback function to pass the Base64 data URL back to the parent
-  onImageRead: (base64Data: string) => void;
-  // Optional callback for errors
-  onError?: (errorMessage: string) => void;
-}
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import LoopIcon from "@mui/icons-material/Loop";
+import { Button } from "@/components/ui/Button";
 
-export default function ImageUploader({
-  onImageRead,
-  onError,
-}: ImageUploaderProps) {
-  const [status, setStatus] = useState<"idle" | "reading" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+export function Upload() {
+  const router = useRouter();
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = event.target.files;
-      if (!files || files.length === 0) {
-        setStatus("idle");
-        setErrorMsg(null);
-        return; // No file selected
-      }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
 
-      const file = files[0];
-      // Basic type check (browser might still allow others via 'All Files')
-      if (!file.type.startsWith("image/")) {
-        setStatus("error");
-        const userMessage = "Please select an image file.";
-        setErrorMsg(userMessage);
-        onError?.(userMessage); // Notify parent if handler exists
-        return;
-      }
+    setFile(selectedFile);
 
-      setStatus("reading");
-      setErrorMsg(null);
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(selectedFile);
+  };
 
-      const reader = new FileReader();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file) return;
 
-      reader.onloadend = () => {
-        // This runs when reading is complete (success or error)
-        if (reader.result && typeof reader.result === "string") {
-          setStatus("idle"); // Ready for next upload
-          setErrorMsg(null);
-          onImageRead(reader.result); // Pass the Base64 data URL up
-        } else {
-          setStatus("error");
-          const userMessage = "Failed to read the file.";
-          setErrorMsg(userMessage);
-          onError?.(userMessage);
-        }
-      };
+    setLoading(true);
 
-      reader.onerror = () => {
-        // Handle FileReader errors specifically
-        setStatus("error");
-        const userMessage = "Error reading the file.";
-        setErrorMsg(userMessage);
-        onError?.(userMessage);
-      };
+    // In a real app, you would upload the file to your server here
+    // For this MVP, we'll simulate the recognition process
 
-      // Start reading the file as a Base64 data URL
-      reader.readAsDataURL(file);
-    },
-    [onImageRead, onError]
-  ); // Dependencies for useCallback
+    // Simulate API call delay
+    setTimeout(() => {
+      // For demo purposes, we'll just redirect to the artwork page
+      // In a real implementation, you would send the image to your backend
+      // and get the artwork ID from the response
+      router.push("/artwork?id=123");
+    }, 1500);
+  };
 
   return (
-    <div
-      style={{
-        border: "1px dashed #ccc",
-        padding: "15px",
-        marginBottom: "15px",
-      }}
-    >
-      <label htmlFor="imageUploadInput">Select Artwork Image:</label>
-      <input
-        type="file"
-        id="imageUploadInput"
-        accept="image/*" // Hint to browser to filter for images
-        onChange={handleFileChange}
-        disabled={status === "reading"} // Disable while processing
-        style={{ display: "block", marginTop: "5px" }}
-      />
-      {status === "reading" && <p style={{ color: "blue" }}>Reading file...</p>}
-      {status === "error" && <p style={{ color: "red" }}>Error: {errorMsg}</p>}
-      {/* Optional: Display thumbnail preview? Could add here */}
-    </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col items-center justify-center gap-4">
+        {preview ? (
+          <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-lg border border-gray-200">
+            <img
+              src={preview || "/placeholder.svg"}
+              alt="Artwork preview"
+              className="h-full w-full object-cover"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="absolute bottom-2 right-2 bg-white"
+              onClick={() => {
+                setFile(null);
+                setPreview(null);
+              }}
+            >
+              Change
+            </Button>
+          </div>
+        ) : (
+          <label className="flex aspect-square w-full max-w-xs cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 p-6 text-center hover:bg-gray-50">
+            <CloudUploadIcon className="h-10 w-10 text-gray-400" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Upload artwork photo</p>
+              <p className="text-xs text-gray-500">
+                JPG, PNG or WEBP (max. 10MB)
+              </p>
+            </div>
+            <input
+              type="file"
+              className="sr-only"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+            />
+          </label>
+        )}
+
+        <Button
+          type="submit"
+          className="w-full max-w-xs"
+          disabled={!file || loading}
+        >
+          {loading ? (
+            <>
+              <LoopIcon className="mr-2 h-4 w-4 animate-spin" />
+              Recognizing artwork...
+            </>
+          ) : (
+            "Recognize Artwork"
+          )}
+        </Button>
+      </div>
+    </form>
   );
 }
