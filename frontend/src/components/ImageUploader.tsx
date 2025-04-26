@@ -98,7 +98,7 @@ export function Upload() {
               recognizing artwork...
             </>
           ) : (
-            "recognize Artwork"
+            "recognize artwork"
           )}
         </Button>
       </div>
